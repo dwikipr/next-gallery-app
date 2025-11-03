@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ImageCard } from "./ImageCard";
-import { ImageModal } from "./ImageModal";
+import { DetailModal } from "./DetailModal";
 import { SearchBar } from "./SearchBar";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ErrorMessage } from "./ErrorMessage";
@@ -175,14 +175,15 @@ export function Gallery({ initialPhotos = [] }: GalleryProps) {
         )}
       </main>
 
-      {/* Image modal */}
+      {/* Detail modal with zoom and download */}
       {selectedImage && (
-        <ImageModal
+        <DetailModal
           image={selectedImage}
           isOpen={!!selectedImage}
           onClose={() => setSelectedImage(null)}
           isFavorite={isFavorite(selectedImage.id)}
           onToggleFavorite={toggleFavorite}
+          showZoomAndDownload={true}
         />
       )}
 

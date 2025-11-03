@@ -160,13 +160,13 @@ export function ImageModal({
       e.preventDefault();
       e.stopPropagation();
       const distance = getDistance(e.touches[0], e.touches[1]);
-      
+
       if (lastPinchDistance > 0) {
         const delta = distance - lastPinchDistance;
         const zoomDelta = delta * 0.01;
         setScale((prev) => Math.max(1, Math.min(4, prev + zoomDelta)));
       }
-      
+
       setLastPinchDistance(distance);
     } else if (isDragging && scale > 1 && e.touches.length === 1) {
       // Pan when zoomed
@@ -190,7 +190,7 @@ export function ImageModal({
   const handleDownload = async () => {
     try {
       setDownloadProgress(0);
-      
+
       // Create abort controller for cancellation
       const controller = new AbortController();
       abortControllerRef.current = controller;
@@ -200,17 +200,17 @@ export function ImageModal({
       });
 
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error("Download failed");
       }
 
       // Get total size
-      const contentLength = response.headers.get('content-length');
+      const contentLength = response.headers.get("content-length");
       const total = contentLength ? parseInt(contentLength, 10) : 0;
 
       // Read the response as a stream
       const reader = response.body?.getReader();
       if (!reader) {
-        throw new Error('Response body is not readable');
+        throw new Error("Response body is not readable");
       }
 
       const chunks: Uint8Array[] = [];
@@ -240,9 +240,9 @@ export function ImageModal({
       }
 
       // Create blob and download
-      const blob = new Blob([chunksAll], { type: 'image/jpeg' });
+      const blob = new Blob([chunksAll], { type: "image/jpeg" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = `unsplash-${image.id}.jpg`;
       document.body.appendChild(link);
@@ -255,10 +255,10 @@ export function ImageModal({
         setDownloadProgress(null);
       }, 1000);
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Download cancelled');
+      if (error instanceof Error && error.name === "AbortError") {
+        console.log("Download cancelled");
       } else {
-        console.error('Error downloading image:', error);
+        console.error("Error downloading image:", error);
       }
       setDownloadProgress(null);
     } finally {
@@ -336,7 +336,7 @@ export function ImageModal({
           </div>
 
           {/* Zoom controls - positioned at bottom of image container */}
-          <div className="absolute bottom-4 lg:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 bg-black/60 dark:bg-black/70 backdrop-blur-md rounded-full p-2 shadow-lg border border-white/10">
+          <div className="absolute bottom-4 lg:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 bg-black/60/70 backdrop-blur-md rounded-full p-2 shadow-lg border border-white/10">
             <button
               onClick={handleZoomOut}
               disabled={scale <= 1}
@@ -360,11 +360,11 @@ export function ImageModal({
         </div>
 
         {/* Sidebar with details - Desktop: fixed sidebar, Mobile: collapsible bottom sheet */}
-        <div className="lg:w-80 xl:w-96 bg-white dark:bg-gray-900 lg:p-4 xl:p-6 overflow-y-auto">
+        <div className="lg:w-80 xl:w-96 bg-white lg:p-4 xl:p-6 overflow-y-auto">
           {/* Mobile: Collapsible header */}
           <button
             onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-            className="lg:hidden w-full flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10"
+            className="lg:hidden w-full flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10"
             aria-label={isDetailsOpen ? "Hide details" : "Show details"}
           >
             <h2 className="text-lg font-semibold">Image Details</h2>
@@ -391,7 +391,7 @@ export function ImageModal({
           >
             {/* Photographer */}
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              <h3 className="text-sm font-semibold text-gray-500 mb-2">
                 PHOTOGRAPHER
               </h3>
               <div className="flex items-center gap-3">
@@ -403,7 +403,7 @@ export function ImageModal({
                     className="w-12 h-12 rounded-full"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
                     <User className="w-6 h-6 text-gray-500" />
                   </div>
                 )}
@@ -420,7 +420,7 @@ export function ImageModal({
                 </div>
               </div>
               {image.user.bio && (
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-sm text-gray-600">
                   {image.user.bio}
                 </p>
               )}
@@ -429,7 +429,7 @@ export function ImageModal({
             {/* Description */}
             {(image.description || image.alt_description) && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                <h3 className="text-sm font-semibold text-gray-500 mb-2">
                   DESCRIPTION
                 </h3>
                 <p className="text-sm">
@@ -440,7 +440,7 @@ export function ImageModal({
 
             {/* Metadata */}
             <div className="mb-6 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              <h3 className="text-sm font-semibold text-gray-500 mb-2">
                 METADATA
               </h3>
               <div className="flex items-center gap-2 text-sm">
@@ -457,7 +457,7 @@ export function ImageModal({
                 <ThumbsUp className="w-4 h-4 text-gray-500" />
                 <span>{image.likes.toLocaleString()} likes</span>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-600">
                 <p>
                   Dimensions: {image.width} × {image.height}
                 </p>
@@ -471,7 +471,7 @@ export function ImageModal({
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   isFavorite
                     ? "bg-red-500 text-white hover:bg-red-600"
-                    : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+                    : "bg-gray-200 hover:bg-gray-300:bg-gray-700"
                 }`}
                 aria-label={
                   isFavorite ? "Remove from favorites" : "Add to favorites"
@@ -484,7 +484,7 @@ export function ImageModal({
               </button>
               <button
                 onClick={handleDownload}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
                 aria-label="Download image"
               >
                 <Download className="w-5 h-5" />

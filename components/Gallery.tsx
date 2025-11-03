@@ -6,7 +6,7 @@ import { ImageModal } from "./ImageModal";
 import { SearchBar } from "./SearchBar";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ErrorMessage } from "./ErrorMessage";
-import { Navigation } from "./Navigation";
+import { BottomNav } from "./BottomNav";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFavorites } from "@/hooks/useFavorites";
 import { searchPhotos } from "@/lib/unsplash";
@@ -112,36 +112,32 @@ export function Gallery({ initialPhotos = [] }: GalleryProps) {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold">Personal Gallery</h1>
-            <Navigation />
-          </div>
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search for photos..."
-          />
+      <header className="sticky top-0 z-30 bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto py-3">
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-1 py-2">
         {/* Loading state */}
-        {isLoading && <LoadingSpinner message="Loading images..." />}
+        {isLoading && (
+          <div className="flex justify-center py-12">
+            <LoadingSpinner message="Loading images..." />
+          </div>
+        )}
 
         {/* Error state */}
         {error && !isLoading && (
           <ErrorMessage message={error} onRetry={handleRetry} />
         )}
 
-        {/* Images grid */}
+        {/* Images grid - 3 columns matching reference design */}
         {!isLoading && !error && images.length > 0 && (
           <>
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
+            <div className="grid grid-cols-3 gap-1">
               {images.map((image) => (
                 <ImageCard
                   key={image.id}
@@ -162,7 +158,7 @@ export function Gallery({ initialPhotos = [] }: GalleryProps) {
 
             {/* End of results */}
             {!hasMore && images.length > 0 && (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+              <p className="text-center text-gray-500 py-8">
                 No more images to load
               </p>
             )}
@@ -172,7 +168,7 @@ export function Gallery({ initialPhotos = [] }: GalleryProps) {
         {/* No results */}
         {!isLoading && !error && images.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-gray-600 text-lg">
               No images found. Try a different search term.
             </p>
           </div>
@@ -189,6 +185,9 @@ export function Gallery({ initialPhotos = [] }: GalleryProps) {
           onToggleFavorite={toggleFavorite}
         />
       )}
+
+      {/* Bottom navigation */}
+      <BottomNav />
     </div>
   );
 }

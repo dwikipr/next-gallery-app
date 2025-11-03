@@ -11,7 +11,7 @@ export function LoadingSpinner({ message = "Loading..." }: LoadingSpinnerProps) 
   return (
     <div className="flex flex-col items-center justify-center py-12">
       <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-      <p className="text-gray-600 dark:text-gray-400">{message}</p>
+      <p className="text-gray-600">{message}</p>
     </div>
   );
 }

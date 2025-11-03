@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, User } from "lucide-react";
+import { Heart } from "lucide-react";
 import type { UnsplashImage } from "@/types/unsplash";
 
 interface ImageCardProps {
@@ -22,18 +22,15 @@ export function ImageCard({
   onClick,
 }: ImageCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [localIsFavorite, setLocalIsFavorite] = useState(isFavorite);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Optimistic update
-    setLocalIsFavorite(!localIsFavorite);
     onToggleFavorite(image.id);
   };
 
   return (
     <div
-      className="group relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-800 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg focus-within:ring-2 focus-within:ring-blue-500"
+      className="group relative overflow-hidden bg-gray-200 cursor-pointer"
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -46,14 +43,15 @@ export function ImageCard({
       aria-label={`View ${image.alt_description || "image"} by ${
         image.user.name
       }`}
+      suppressHydrationWarning
     >
-      {/* Image */}
+      {/* Image - perfectly square */}
       <div className="relative w-full aspect-square overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image.urls.small}
           alt={image.alt_description || image.description || "Unsplash image"}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
+          className={`w-full h-full object-cover ${
             isLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setIsLoaded(true)}
@@ -68,54 +66,32 @@ export function ImageCard({
           />
         )}
 
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Subtle overlay on hover */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
 
-        {/* Favorite button */}
+        {/* Favorite button - always visible when favorited */}
         <button
           onClick={handleFavoriteClick}
-          className={`absolute top-1 right-1 p-1.5 md:p-2 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            localIsFavorite
+          className={`absolute top-2 right-2 p-1.5 rounded-full bg-white/90 backdrop-blur-sm transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+            isFavorite
               ? "opacity-100"
-              : "opacity-0 md:group-hover:opacity-100 focus:opacity-100"
+              : "opacity-0 group-hover:opacity-100 focus:opacity-100"
           }`}
           aria-label={
-            localIsFavorite ? "Remove from favorites" : "Add to favorites"
+            isFavorite ? "Remove from favorites" : "Add to favorites"
           }
           type="button"
+          suppressHydrationWarning
         >
           <Heart
-            className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${
-              localIsFavorite
+            className={`w-4 h-4 transition-colors ${
+              isFavorite
                 ? "fill-red-500 text-red-500"
-                : "text-gray-700 dark:text-gray-300"
+                : "text-gray-700"
             }`}
+            suppressHydrationWarning
           />
         </button>
-
-        {/* Photographer info */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="flex items-center gap-2">
-            {image.user.profile_image?.small ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={image.user.profile_image.small}
-                alt={image.user.name}
-                className="w-8 h-8 rounded-full border-2 border-white"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                <User className="w-5 h-5" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{image.user.name}</p>
-              <p className="text-xs text-white/80 truncate">
-                @{image.user.username}
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

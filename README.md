@@ -1,36 +1,181 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Unsplash Gallery Application
+
+A responsive, modern gallery application built with Next.js 16, TypeScript, Tailwind CSS, and the Unsplash API. Features include infinite scroll pagination, debounced search, favorite images with localStorage persistence, and a full-featured image modal with zoom capabilities.
+
+## Features
+
+- **🖼️ Unsplash Integration**: Browse high-quality photos from Unsplash
+- **🔍 Debounced Search**: Real-time search with 500ms debounce
+- **📱 Responsive Design**: Mobile-first responsive grid layout
+- **❤️ Favorites**: Mark images as favorites with localStorage persistence
+- **🔎 Image Modal**: Click any image to view high-resolution version with:
+  - Pinch and scroll zoom (1x to 4x)
+  - Drag to pan when zoomed
+  - Photographer metadata
+  - Download functionality
+- **♾️ Infinite Scroll**: Automatic pagination as you scroll
+- **⚡ Optimistic Updates**: Instant UI feedback for favorite actions
+- **♿ Accessible**: ARIA labels, keyboard navigation, focus management
+- **🎨 Dark Mode**: Automatic dark mode support
+- **🔤 Custom Font**: Poppins font via next/font/google
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Icons**: Lucide React
+- **API**: Unsplash REST API
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18.17 or later
+- An Unsplash API Access Key (free at [unsplash.com/developers](https://unsplash.com/developers))
+
+### Installation
+
+1. **Clone the repository** (or navigate to the project directory):
+
+```bash
+cd next-galery-app
+```
+
+2. **Install dependencies**:
+
+```bash
+npm install
+```
+
+3. **Set up environment variables**:
+
+Create a `.env.local` file in the root directory:
+
+```bash
+NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_access_key_here
+```
+
+Replace `your_unsplash_access_key_here` with your actual Unsplash Access Key.
+
+### Running the Application
+
+**Development mode**:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Production build**:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+**Linting**:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+next-galery-app/
+├── app/
+│   ├── layout.tsx          # Root layout with Poppins font
+│   ├── page.tsx            # Home page (Gallery component)
+│   └── globals.css         # Global styles
+├── components/
+│   ├── Gallery.tsx         # Main gallery with search and pagination
+│   ├── ImageCard.tsx       # Individual image card with favorite button
+│   ├── ImageModal.tsx      # Full-screen modal with zoom
+│   ├── SearchBar.tsx       # Search input with clear button
+│   ├── LoadingSpinner.tsx  # Loading state component
+│   └── ErrorMessage.tsx    # Error state component
+├── hooks/
+│   ├── useDebounce.ts      # Debounce hook for search
+│   ├── useLocalStorage.ts  # localStorage sync hook
+│   └── useFavorites.ts     # Favorites management hook
+├── lib/
+│   └── unsplash.ts         # Unsplash API service
+├── types/
+│   └── unsplash.ts         # TypeScript interfaces
+├── .env.local              # Environment variables (not in git)
+└── .env.example            # Example environment variables
+```
 
-## Deploy on Vercel
+## Features in Detail
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Search Functionality
+- Type in the search bar to search Unsplash photos
+- 500ms debounce prevents excessive API calls
+- Clear button to reset search
+- Results update automatically
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Favorites System
+- Click the heart icon to favorite/unfavorite an image
+- Optimistic updates for instant feedback
+- Favorites persist in localStorage
+- Survives browser refresh and closing
+
+### Image Modal
+- Click any image to open full-resolution view
+- **Zoom controls**: Use +/- buttons or scroll wheel
+- **Pan**: Drag the image when zoomed in
+- **Keyboard shortcuts**: 
+  - `Escape` to close
+  - `+/=` to zoom in
+  - `-/_` to zoom out
+- View photographer details and metadata
+- Download original image
+- Toggle favorite from modal
+
+### Infinite Scroll
+- Automatically loads more images as you scroll
+- Loading indicator shows when fetching
+- Graceful end-of-results message
+
+### Accessibility
+- ARIA labels on all interactive elements
+- Keyboard navigation support
+- Focus management
+- Alt text on all images
+- Screen reader friendly
+
+## API Rate Limits
+
+Unsplash API free tier includes:
+- 50 requests per hour
+- Each search or page load = 1 request
+
+The app implements caching to minimize API calls.
+
+## Troubleshooting
+
+**"NEXT_PUBLIC_UNSPLASH_ACCESS_KEY is not set" warning**:
+- Make sure `.env.local` exists in the project root
+- Ensure the variable name is exactly `NEXT_PUBLIC_UNSPLASH_ACCESS_KEY`
+- Restart the development server after adding the key
+
+**Images not loading**:
+- Verify your Unsplash API key is valid
+- Check your internet connection
+- Check browser console for API errors
+
+**TypeScript errors**:
+- Run `npm install` to ensure all dependencies are installed
+- Check that TypeScript version matches `package.json`
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Credits
+
+- Photos provided by [Unsplash](https://unsplash.com)
+- Icons by [Lucide](https://lucide.dev)
+- Built with [Next.js](https://nextjs.org)

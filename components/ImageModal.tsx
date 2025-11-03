@@ -41,6 +41,7 @@ export function ImageModal({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [currentImageId, setCurrentImageId] = useState(image.id);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
+  const [lastPinchDistance, setLastPinchDistance] = useState(0);
   const imageRef = useRef<HTMLDivElement>(null);
 
   // Reset zoom when image changes
@@ -126,8 +127,20 @@ export function ImageModal({
     setIsDragging(false);
   };
 
+  const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (scale > 1 && e.touches.length === 1) {
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      e.stopPropagation();
+      const distance = getDistance(e.touches[0], e.touches[1]);
+      setLastPinchDistance(distance);
+    } else if (scale > 1 && e.touches.length === 1) {
+      // Pan when zoomed
       e.stopPropagation();
       setIsDragging(true);
       const touch = e.touches[0];
@@ -139,7 +152,21 @@ export function ImageModal({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging && scale > 1 && e.touches.length === 1) {
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      e.preventDefault();
+      e.stopPropagation();
+      const distance = getDistance(e.touches[0], e.touches[1]);
+      
+      if (lastPinchDistance > 0) {
+        const delta = distance - lastPinchDistance;
+        const zoomDelta = delta * 0.01;
+        setScale((prev) => Math.max(1, Math.min(4, prev + zoomDelta)));
+      }
+      
+      setLastPinchDistance(distance);
+    } else if (isDragging && scale > 1 && e.touches.length === 1) {
+      // Pan when zoomed
       e.stopPropagation();
       const touch = e.touches[0];
       setPosition({
@@ -151,6 +178,10 @@ export function ImageModal({
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    setLastPinchDistance(0);
+    if (scale <= 1) {
+      setPosition({ x: 0, y: 0 });
+    }
   };
 
   const handleDownload = async () => {

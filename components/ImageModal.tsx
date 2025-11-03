@@ -203,7 +203,7 @@ export function ImageModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Image container */}
-        <div className="flex-1 flex items-center justify-center p-2 md:p-4 lg:p-6 overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-center p-2 md:p-4 lg:p-6 overflow-hidden relative">
           <div
             ref={imageRef}
             className={`relative select-none ${
@@ -232,12 +232,12 @@ export function ImageModal({
             />
           </div>
 
-          {/* Zoom controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-white/10 backdrop-blur-sm rounded-full p-2">
+          {/* Zoom controls - positioned at bottom of image container */}
+          <div className="absolute bottom-4 lg:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 bg-black/60 dark:bg-black/70 backdrop-blur-md rounded-full p-2 shadow-lg border border-white/10">
             <button
               onClick={handleZoomOut}
               disabled={scale <= 1}
-              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Zoom out"
             >
               <ZoomOut className="w-5 h-5" />
@@ -248,7 +248,7 @@ export function ImageModal({
             <button
               onClick={handleZoomIn}
               disabled={scale >= 4}
-              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-full hover:bg-white/20 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Zoom in"
             >
               <ZoomIn className="w-5 h-5" />

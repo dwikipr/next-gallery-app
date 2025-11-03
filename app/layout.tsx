@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 
@@ -12,6 +12,13 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Unsplash Gallery - Beautiful Photo Collection",
   description: "Browse and search beautiful photos from Unsplash with favorites and high-resolution viewing",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

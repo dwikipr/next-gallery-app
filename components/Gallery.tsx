@@ -13,15 +13,20 @@ import { searchPhotos } from "@/lib/unsplash";
 import type { UnsplashImage } from "@/types/unsplash";
 import { Loader2 } from "lucide-react";
 
+interface GalleryProps {
+  initialPhotos?: UnsplashImage[];
+}
+
 /**
  * Main Gallery component
  * Manages image fetching, search, pagination, and modal state
+ * Supports SSR with initial photos
  */
-export function Gallery() {
-  const [images, setImages] = useState<UnsplashImage[]>([]);
+export function Gallery({ initialPhotos = [] }: GalleryProps) {
+  const [images, setImages] = useState<UnsplashImage[]>(initialPhotos);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);

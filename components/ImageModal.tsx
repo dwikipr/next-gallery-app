@@ -15,6 +15,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import type { UnsplashImage } from "@/types/unsplash";
+import { DownloadProgress } from "./DownloadProgress";
 
 interface ImageModalProps {
   image: UnsplashImage;
@@ -42,7 +43,9 @@ export function ImageModal({
   const [currentImageId, setCurrentImageId] = useState(image.id);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [lastPinchDistance, setLastPinchDistance] = useState(0);
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Reset zoom when image changes
   if (currentImageId !== image.id) {
@@ -186,18 +189,87 @@ export function ImageModal({
 
   const handleDownload = async () => {
     try {
-      const response = await fetch(image.urls.full);
-      const blob = await response.blob();
+      setDownloadProgress(0);
+      
+      // Create abort controller for cancellation
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      const response = await fetch(image.urls.full, {
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+
+      // Get total size
+      const contentLength = response.headers.get('content-length');
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+      // Read the response as a stream
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('Response body is not readable');
+      }
+
+      const chunks: Uint8Array[] = [];
+      let receivedLength = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        chunks.push(value);
+        receivedLength += value.length;
+
+        // Update progress
+        if (total > 0) {
+          const progress = (receivedLength / total) * 100;
+          setDownloadProgress(progress);
+        }
+      }
+
+      // Combine chunks into single array
+      const chunksAll = new Uint8Array(receivedLength);
+      let position = 0;
+      for (const chunk of chunks) {
+        chunksAll.set(chunk, position);
+        position += chunk.length;
+      }
+
+      // Create blob and download
+      const blob = new Blob([chunksAll], { type: 'image/jpeg' });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
       link.download = `unsplash-${image.id}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading image:", error);
+
+      // Reset progress after a short delay
+      setTimeout(() => {
+        setDownloadProgress(null);
+      }, 1000);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Download cancelled');
+      } else {
+        console.error('Error downloading image:', error);
+      }
+      setDownloadProgress(null);
+    } finally {
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleCancelDownload = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setDownloadProgress(null);
     }
   };
 
@@ -432,6 +504,15 @@ export function ImageModal({
           </div>
         </div>
       </div>
+
+      {/* Download Progress */}
+      {downloadProgress !== null && (
+        <DownloadProgress
+          progress={downloadProgress}
+          fileName={`unsplash-${image.id}.jpg`}
+          onCancel={handleCancelDownload}
+        />
+      )}
     </div>
   );
 }

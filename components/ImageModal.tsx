@@ -1,7 +1,19 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { X, Heart, Download, MapPin, Calendar, ThumbsUp, ZoomIn, ZoomOut, User, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  X,
+  Heart,
+  Download,
+  MapPin,
+  Calendar,
+  ThumbsUp,
+  ZoomIn,
+  ZoomOut,
+  User,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import type { UnsplashImage } from "@/types/unsplash";
 
 interface ImageModalProps {
@@ -16,7 +28,13 @@ interface ImageModalProps {
  * ImageModal displays full-resolution image with zoom capabilities
  * Supports pinch/scroll zoom, keyboard navigation, and detailed metadata
  */
-export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorite }: ImageModalProps) {
+export function ImageModal({
+  image,
+  isOpen,
+  onClose,
+  isFavorite,
+  onToggleFavorite,
+}: ImageModalProps) {
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -113,7 +131,10 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
       e.stopPropagation();
       setIsDragging(true);
       const touch = e.touches[0];
-      setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
+      setDragStart({
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y,
+      });
     }
   };
 
@@ -177,12 +198,17 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
       </button>
 
       {/* Content wrapper */}
-      <div className="w-full h-full flex flex-col lg:flex-row" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="w-full h-full flex flex-col lg:flex-row"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Image container */}
-        <div className="flex-1 flex items-center justify-center p-4 lg:p-8 overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-2 md:p-4 lg:p-6 overflow-hidden">
           <div
             ref={imageRef}
-            className={`relative select-none ${scale > 1 ? "cursor-move" : "cursor-default"}`}
+            className={`relative select-none ${
+              scale > 1 ? "cursor-move" : "cursor-default"
+            }`}
             onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -196,9 +222,11 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
             <img
               src={image.urls.regular}
               alt={image.alt_description || image.description || "Image"}
-              className="max-w-full max-h-[80vh] object-contain"
+              className="max-w-full max-h-[70vh] md:max-h-[85vh] lg:max-h-[90vh] object-contain"
               style={{
-                transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                transform: `scale(${scale}) translate(${
+                  position.x / scale
+                }px, ${position.y / scale}px)`,
                 transition: isDragging ? "none" : "transform 0.1s ease-out",
               }}
             />
@@ -214,7 +242,9 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
             >
               <ZoomOut className="w-5 h-5" />
             </button>
-            <span className="px-3 py-2 text-white text-sm font-medium">{Math.round(scale * 100)}%</span>
+            <span className="px-3 py-2 text-white text-sm font-medium">
+              {Math.round(scale * 100)}%
+            </span>
             <button
               onClick={handleZoomIn}
               disabled={scale >= 4}
@@ -227,7 +257,7 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
         </div>
 
         {/* Sidebar with details - Desktop: fixed sidebar, Mobile: collapsible bottom sheet */}
-        <div className="lg:w-96 bg-white dark:bg-gray-900 lg:p-6 overflow-y-auto">
+        <div className="lg:w-80 xl:w-96 bg-white dark:bg-gray-900 lg:p-4 xl:p-6 overflow-y-auto">
           {/* Mobile: Collapsible header */}
           <button
             onClick={() => setIsDetailsOpen(!isDetailsOpen)}
@@ -235,23 +265,40 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
             aria-label={isDetailsOpen ? "Hide details" : "Show details"}
           >
             <h2 className="text-lg font-semibold">Image Details</h2>
-            {isDetailsOpen ? <ChevronDown className="w-6 h-6" /> : <ChevronUp className="w-6 h-6" />}
+            {isDetailsOpen ? (
+              <ChevronDown className="w-6 h-6" />
+            ) : (
+              <ChevronUp className="w-6 h-6" />
+            )}
           </button>
 
           {/* Desktop: Always visible title */}
-          <h2 id="modal-title" className="hidden lg:block text-2xl font-semibold mb-4">
+          <h2
+            id="modal-title"
+            className="hidden lg:block text-2xl font-semibold mb-4"
+          >
             Image Details
           </h2>
 
           {/* Collapsible content */}
-          <div className={`${isDetailsOpen ? "block" : "hidden"} lg:block p-4 lg:p-0`}>
+          <div
+            className={`${
+              isDetailsOpen ? "block" : "hidden"
+            } lg:block p-4 lg:p-0`}
+          >
             {/* Photographer */}
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">PHOTOGRAPHER</h3>
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                PHOTOGRAPHER
+              </h3>
               <div className="flex items-center gap-3">
                 {image.user.profile_image?.medium ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={image.user.profile_image.medium} alt={image.user.name} className="w-12 h-12 rounded-full" />
+                  <img
+                    src={image.user.profile_image.medium}
+                    alt={image.user.name}
+                    className="w-12 h-12 rounded-full"
+                  />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                     <User className="w-6 h-6 text-gray-500" />
@@ -259,25 +306,40 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
                 )}
                 <div>
                   <p className="font-semibold">{image.user.name}</p>
-                  <a href={image.user.links.html} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">
+                  <a
+                    href={image.user.links.html}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-500 hover:underline"
+                  >
                     @{image.user.username}
                   </a>
                 </div>
               </div>
-              {image.user.bio && <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{image.user.bio}</p>}
+              {image.user.bio && (
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  {image.user.bio}
+                </p>
+              )}
             </div>
 
             {/* Description */}
             {(image.description || image.alt_description) && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">DESCRIPTION</h3>
-                <p className="text-sm">{image.description || image.alt_description}</p>
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                  DESCRIPTION
+                </h3>
+                <p className="text-sm">
+                  {image.description || image.alt_description}
+                </p>
               </div>
             )}
 
             {/* Metadata */}
             <div className="mb-6 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">METADATA</h3>
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                METADATA
+              </h3>
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4 text-gray-500" />
                 <span>Published {formatDate(image.created_at)}</span>
@@ -304,11 +366,17 @@ export function ImageModal({ image, isOpen, onClose, isFavorite, onToggleFavorit
               <button
                 onClick={() => onToggleFavorite(image.id)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  isFavorite ? "bg-red-500 text-white hover:bg-red-600" : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+                  isFavorite
+                    ? "bg-red-500 text-white hover:bg-red-600"
+                    : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
                 }`}
-                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                aria-label={
+                  isFavorite ? "Remove from favorites" : "Add to favorites"
+                }
               >
-                <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+                <Heart
+                  className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`}
+                />
                 {isFavorite ? "Favorited" : "Favorite"}
               </button>
               <button

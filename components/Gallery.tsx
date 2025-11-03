@@ -25,7 +25,9 @@ export function Gallery() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<UnsplashImage | null>(null);
+  const [selectedImage, setSelectedImage] = useState<UnsplashImage | null>(
+    null
+  );
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -52,7 +54,11 @@ export function Gallery() {
         setHasMore(pageNum < response.total_pages);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load images. Please check your API key and try again.");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load images. Please check your API key and try again."
+        );
         if (isNewSearch) {
           setImages([]);
         }
@@ -73,7 +79,13 @@ export function Gallery() {
   // Infinite scroll handler
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 500 && !isLoadingMore && !isLoading && hasMore) {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 500 &&
+        !isLoadingMore &&
+        !isLoading &&
+        hasMore
+      ) {
         setPage((prev) => prev + 1);
       }
     };
@@ -103,7 +115,11 @@ export function Gallery() {
             <h1 className="text-2xl font-semibold">Personal Gallery</h1>
             <Navigation />
           </div>
-          <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search for photos..." />
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search for photos..."
+          />
         </div>
       </header>
 
@@ -113,12 +129,14 @@ export function Gallery() {
         {isLoading && <LoadingSpinner message="Loading images..." />}
 
         {/* Error state */}
-        {error && !isLoading && <ErrorMessage message={error} onRetry={handleRetry} />}
+        {error && !isLoading && (
+          <ErrorMessage message={error} onRetry={handleRetry} />
+        )}
 
         {/* Images grid */}
         {!isLoading && !error && images.length > 0 && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
               {images.map((image) => (
                 <ImageCard
                   key={image.id}
@@ -138,14 +156,20 @@ export function Gallery() {
             )}
 
             {/* End of results */}
-            {!hasMore && images.length > 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-8">No more images to load</p>}
+            {!hasMore && images.length > 0 && (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                No more images to load
+              </p>
+            )}
           </>
         )}
 
         {/* No results */}
         {!isLoading && !error && images.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">No images found. Try a different search term.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              No images found. Try a different search term.
+            </p>
           </div>
         )}
       </main>

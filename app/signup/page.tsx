@@ -1,18 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import { signup, login } from '@/lib/api';
+import { signup, login as loginApi } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,11 +32,10 @@ export default function SignupPage() {
       await signup({ username, email, password });
       
       // Then login to get token
-      const response = await login({ email, password });
+      const response = await loginApi({ email, password });
       
-      // Store token and user data
-      localStorage.setItem('auth_token', response.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      // Update auth context with token and user data
+      login(response.accessToken, response.user);
       
       // Redirect to home
       router.push('/');

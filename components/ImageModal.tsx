@@ -420,9 +420,7 @@ export function ImageModal({
                 </div>
               </div>
               {image.user.bio && (
-                <p className="mt-2 text-sm text-gray-600">
-                  {image.user.bio}
-                </p>
+                <p className="mt-2 text-sm text-gray-600">{image.user.bio}</p>
               )}
             </div>
 
@@ -494,7 +492,7 @@ export function ImageModal({
 
             {/* Link to Unsplash */}
             <a
-              href={image.links.html}
+              href={image?.links?.html || ""}
               target="_blank"
               rel="noopener noreferrer"
               className="block mt-4 text-center text-sm text-blue-500 hover:underline"

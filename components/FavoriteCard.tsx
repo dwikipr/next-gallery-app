@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Trash2 } from 'lucide-react';
-import type { UnsplashImage } from '@/types/unsplash';
+import { Trash2 } from "lucide-react";
+import type { UnsplashImage } from "@/types/unsplash";
 
 interface FavoriteCardProps {
   image: UnsplashImage;
@@ -24,11 +24,11 @@ export function FavoriteCard({ image, onRemove, onClick }: FavoriteCardProps) {
       onClick={onClick}
     >
       {/* Large image */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden">
+      <div className="relative w-full aspect-4/3 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image.urls.regular}
-          alt={image.alt_description || image.description || 'Saved image'}
+          alt={image.alt_description || image.description || "Saved image"}
           className="w-full h-full object-cover"
           loading="lazy"
         />
@@ -41,7 +41,7 @@ export function FavoriteCard({ image, onRemove, onClick }: FavoriteCardProps) {
           <p className="text-sm text-gray-500 mb-1">Description</p>
           <p className="text-xs text-gray-400">Score: 61</p>
         </div>
-        
+
         {/* Delete button */}
         <button
           onClick={handleRemove}

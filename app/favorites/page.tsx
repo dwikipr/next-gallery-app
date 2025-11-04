@@ -1,116 +1,175 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { FavoriteCard } from "@/components/FavoriteCard";
-import { DetailModal } from "@/components/DetailModal";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { BottomNav } from "@/components/BottomNav";
-import { useFavorites } from "@/hooks/useFavorites";
-
-import type { UnsplashImage } from "@/types/unsplash";
+import { useState, useEffect } from 'react';
+import { FavoriteCard } from '@/components/FavoriteCard';
+import { DetailModal } from '@/components/DetailModal';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { BottomNav } from '@/components/BottomNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchSavedImages, deleteSavedImage } from '@/lib/api';
+import type { SavedImage } from '@/types/api';
 
 /**
- * Favorites page displays all favorited images
+ * Favorites page displays saved images from backend
  */
 export default function FavoritesPage() {
-  const { favorites, isFavorite, toggleFavorite } = useFavorites();
-  const [favoriteImages, setFavoriteImages] = useState<UnsplashImage[]>([]);
-  const [selectedImage, setSelectedImage] = useState<UnsplashImage | null>(
-    null
-  );
+  const { token } = useAuth();
+  const [savedImages, setSavedImages] = useState<SavedImage[]>([]);
+  const [selectedImage, setSelectedImage] = useState<SavedImage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFavoriteImages = async () => {
-      if (favorites.length === 0) {
-        setIsLoading(false);
-        return;
-      }
+    const loadSavedImages = async () => {
+      if (!token) return;
 
       try {
         setIsLoading(true);
-        const ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
-
-        const imagePromises = favorites.map(async (fav) => {
-          const response = await fetch(
-            `https://api.unsplash.com/photos/${fav.id}?client_id=${ACCESS_KEY}`
-          );
-          if (response.ok) {
-            return await response.json();
-          }
-          return null;
-        });
-
-        const images = await Promise.all(imagePromises);
-        setFavoriteImages(
-          images.filter((img) => img !== null) as UnsplashImage[]
-        );
+        const data = await fetchSavedImages(token);
+        setSavedImages(data);
       } catch (error) {
-        console.error("Error fetching favorite images:", error);
+        console.error('Error fetching saved images:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchFavoriteImages();
-  }, [favorites]);
+    loadSavedImages();
+  }, [token]);
+
+  const handleRemove = async (savedImageId: string) => {
+    if (!token) return;
+
+    // Find the saved image to get the savedImageId
+    const savedImage = savedImages.find((img) => img.publicImageId === savedImageId);
+    if (!savedImage) return;
+
+    try {
+      // Optimistic update
+      setSavedImages((prev) => prev.filter((img) => img.savedImageId !== savedImage.savedImageId));
+      
+      await deleteSavedImage(token, savedImage.savedImageId);
+    } catch (error) {
+      console.error('Error removing saved image:', error);
+      // Revert on error
+      if (token) {
+        const data = await fetchSavedImages(token);
+        setSavedImages(data);
+      }
+    }
+  };
+
+  const isFavorite = (imageId: string) => {
+    return savedImages.some((img) => img.publicImageId === imageId);
+  };
+
+  const handleToggleFavorite = (imageId: string) => {
+    handleRemove(imageId);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-semibold">Save Image</h1>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="max-w-3xl mx-auto px-4 py-6">
-        {/* Loading state */}
-        {isLoading && (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner message="Loading favorites..." />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 pb-20">
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+          <div className="max-w-3xl mx-auto px-4 py-4">
+            <h1 className="text-xl font-semibold">Save Image</h1>
           </div>
+        </header>
+
+        {/* Main content */}
+        <main className="max-w-3xl mx-auto px-4 py-6">
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex justify-center py-12">
+              <LoadingSpinner message="Loading saved images..." />
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!isLoading && savedImages.length === 0 && (
+            <div className="text-center py-16 px-4">
+              <h2 className="text-xl font-semibold mb-2">No saved images yet</h2>
+              <p className="text-gray-600 mb-6">
+                Tap the heart icon on images to save them here!
+              </p>
+            </div>
+          )}
+
+          {/* Saved images list */}
+          {!isLoading && savedImages.length > 0 && (
+            <div className="space-y-4">
+              {savedImages.map((image) => (
+                <FavoriteCard
+                  key={image.savedImageId}
+                  image={{
+                    id: image.publicImageId,
+                    urls: {
+                      small: image.imageUrl,
+                      regular: image.imageUrl,
+                      full: image.imageUrl,
+                    },
+                    alt_description: image.title,
+                    description: image.description,
+                    user: {
+                      name: 'Unknown',
+                      username: 'unknown',
+                      profile_image: { small: '', medium: '' },
+                      links: { html: '#' },
+                      bio: '',
+                      location: '',
+                    },
+                    width: 1000,
+                    height: 1000,
+                    likes: 0,
+                    created_at: new Date().toISOString(),
+                    color: '#cccccc',
+                  }}
+                  onRemove={handleRemove}
+                  onClick={() => setSelectedImage(image)}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+
+        {/* Detail modal */}
+        {selectedImage && (
+          <DetailModal
+            image={{
+              id: selectedImage.publicImageId,
+              urls: {
+                small: selectedImage.imageUrl,
+                regular: selectedImage.imageUrl,
+                full: selectedImage.imageUrl,
+              },
+              alt_description: selectedImage.title,
+              description: selectedImage.description,
+              user: {
+                name: 'Unknown',
+                username: 'unknown',
+                profile_image: { small: '', medium: '' },
+                links: { html: '#' },
+                bio: '',
+                location: '',
+              },
+              width: 1000,
+              height: 1000,
+              likes: 0,
+              created_at: new Date().toISOString(),
+              color: '#cccccc',
+            }}
+            isOpen={!!selectedImage}
+            onClose={() => setSelectedImage(null)}
+            isFavorite={isFavorite(selectedImage.publicImageId)}
+            onToggleFavorite={handleToggleFavorite}
+            showZoomAndDownload={false}
+          />
         )}
 
-        {/* Empty state */}
-        {!isLoading && favoriteImages.length === 0 && (
-          <div className="text-center py-16 px-4">
-            <h2 className="text-xl font-semibold mb-2">No saved images yet</h2>
-            <p className="text-gray-600 mb-6">
-              Tap the heart icon on images to save them here!
-            </p>
-          </div>
-        )}
-
-        {/* Favorites list - full width cards with spacing */}
-        {!isLoading && favoriteImages.length > 0 && (
-          <div className="space-y-4">
-            {favoriteImages.map((image) => (
-              <FavoriteCard
-                key={image.id}
-                image={image}
-                onRemove={toggleFavorite}
-                onClick={() => setSelectedImage(image)}
-              />
-            ))}
-          </div>
-        )}
-      </main>
-
-      {/* Detail modal */}
-      {selectedImage && (
-        <DetailModal
-          image={selectedImage}
-          isOpen={!!selectedImage}
-          onClose={() => setSelectedImage(null)}
-          isFavorite={isFavorite(selectedImage.id)}
-          onToggleFavorite={toggleFavorite}
-        />
-      )}
-
-      {/* Bottom navigation */}
-      <BottomNav />
-    </div>
+        {/* Bottom navigation */}
+        <BottomNav />
+      </div>
+    </ProtectedRoute>
   );
 }

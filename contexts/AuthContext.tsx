@@ -24,8 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const savedUser = localStorage.getItem('user');
       return savedUser ? JSON.parse(savedUser) : null;
-    } catch (error) {
-      console.error('Error parsing saved user:', error);
+    } catch {
       return null;
     }
   });

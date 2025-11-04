@@ -180,9 +180,7 @@ export function DetailModal({
       setTimeout(() => setDownloadProgress(null), 1000);
     } catch (error: unknown) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Download cancelled');
-      } else {
-        console.error('Error downloading image:', error);
+        // Download cancelled by user
       }
       setDownloadProgress(null);
     } finally {

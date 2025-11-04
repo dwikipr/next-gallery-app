@@ -27,8 +27,8 @@ export default function FavoritesPage() {
         setIsLoading(true);
         const data = await fetchSavedImages(token);
         setSavedImages(data);
-      } catch (error) {
-        console.error('Error fetching saved images:', error);
+      } catch {
+        // Silently handle error
       } finally {
         setIsLoading(false);
       }
@@ -49,8 +49,7 @@ export default function FavoritesPage() {
       setSavedImages((prev) => prev.filter((img) => img.savedImageId !== savedImage.savedImageId));
       
       await deleteSavedImage(token, savedImage.savedImageId);
-    } catch (error) {
-      console.error('Error removing saved image:', error);
+    } catch {
       // Revert on error
       if (token) {
         const data = await fetchSavedImages(token);

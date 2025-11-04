@@ -34,14 +34,21 @@ export default function SignupPage() {
       // Then login to get token
       const response = await loginApi({ email, password });
       
-      // Update auth context with token and user data
-      login(response.accessToken, response.user);
+      // Create user object from signup data if not provided by API
+      const user = response.user || {
+        id: 'user-' + Date.now(),
+        username: username,
+        email: email,
+        createdAt: new Date().toISOString()
+      };
       
-      // Redirect to home
-      router.push('/');
+      // Update auth context with token and user data
+      login(response.accessToken, user);
+      
+      // Force redirect to home after state update
+      window.location.href = '/';
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Signup failed');
-    } finally {
       setIsLoading(false);
     }
   };

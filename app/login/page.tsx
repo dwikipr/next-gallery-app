@@ -29,14 +29,24 @@ export default function LoginPage() {
     try {
       const response = await loginApi({ email, password });
       
-      // Update auth context with token and user data
-      login(response.accessToken, response.user);
+      if (!response.accessToken) {
+        throw new Error('Invalid login response from server');
+      }
       
-      // Redirect to home
-      router.push('/');
+      const user = response.user || {
+        id: 'user-' + Date.now(),
+        username: email.split('@')[0],
+        email: email,
+        createdAt: new Date().toISOString()
+      };
+      
+      login(response.accessToken, user);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      window.location.href = '/';
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
       setIsLoading(false);
     }
   };

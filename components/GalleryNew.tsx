@@ -71,8 +71,8 @@ export function GalleryNew() {
         const data = await fetchSavedImages(token);
         setSavedImages(data);
         setSavedImageIds(new Set(data.map((img) => img.publicImageId)));
-      } catch (error) {
-        console.error('Error loading saved images:', error);
+      } catch {
+        // Silently fail - saved images are optional
       }
     };
 
@@ -108,8 +108,7 @@ export function GalleryNew() {
         const newSaved = await saveImage(token, { publicImageId: imageId });
         setSavedImages((prev) => [...prev, newSaved]);
       }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
+    } catch {
       // Revert on error
       setSavedImageIds((prev) => {
         const newSet = new Set(prev);
